@@ -16,6 +16,11 @@ class LoginController extends StateNotifier<AsyncValue<void>> {
     state =
         await AsyncValue.guard(() => authRepository.login(username, password));
   }
+
+  Future<void> logout() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(authRepository.logout);
+  }
 }
 
 final loginScreenControllerProvider =
