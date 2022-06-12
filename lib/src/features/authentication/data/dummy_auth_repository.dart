@@ -9,7 +9,7 @@ class DummyAuthRepository {
   AppUser? get currentUser => _authState.value;
 
   Future<void> loginAnonymous() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 3));
     _authState.value = AppUser(
       userId: '1',
       name: 'Anonymous',

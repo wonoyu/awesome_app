@@ -26,7 +26,7 @@ void main() {
   group('HomeScreenController', () {
     test('initial state is AsyncData', () {
       verifyNever(() => homeRepository.setCuratedPhotos(curatedPhotos));
-      expect(controller.debugState, const AsyncData(null));
+      expect(controller.debugState, const AsyncData<void>(null));
     });
 
     test(
@@ -43,7 +43,7 @@ void main() {
             ]));
         await controller.getCuratedPhotos();
         // verify
-        verify(homeRepository.getCuratedPhotos).called(2);
+        verify(homeRepository.getCuratedPhotos).called(1);
       },
       timeout: const Timeout(
         Duration(milliseconds: 500),
@@ -68,7 +68,7 @@ void main() {
             ]));
         await controller.getCuratedPhotos();
         // verify
-        verify(homeRepository.getCuratedPhotos).called(2);
+        verify(homeRepository.getCuratedPhotos).called(1);
       },
       timeout: const Timeout(
         Duration(milliseconds: 500),

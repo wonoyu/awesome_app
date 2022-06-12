@@ -106,6 +106,7 @@ class HomeDetail extends ConsumerWidget {
                       ])),
                   height: AppConstants.getSize(context).height * 0.10,
                   child: GestureDetector(
+                    key: const Key("source"),
                     onTap: () async {
                       if (await canLaunchUrlString(photo!.src!.portrait!)) {
                         await launchUrlString(photo!.src!.portrait!,

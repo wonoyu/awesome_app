@@ -36,10 +36,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         (_, state) => state.showSnackbarOnError(context));
     final state = ref.watch(loginScreenControllerProvider);
     return SafeArea(
+        key: const Key("loginSafeArea"),
         child: Scaffold(
-      backgroundColor: Colors.white,
-      body: _buildBody(context, state),
-    ));
+          backgroundColor: Colors.white,
+          body: _buildBody(context, state),
+        ));
   }
 
   Widget _buildBody(BuildContext context, AsyncValue<void> state) {

@@ -16,12 +16,14 @@ class CollapsibleAppbar extends ConsumerWidget {
     final stateLikedPhotos = ref.watch(likedPhotosStateChangesProvider).value;
     final listStyle = ref.watch(changeStyleProvider);
     return SliverAppBar(
+      key: const Key("collapsibleAppbar"),
       primary: false,
       title: const Text("Discover"),
       elevation: 0.0,
       backgroundColor: Colors.white,
       actions: [
         AppbarActions(
+            key: const Key("changeStyleKey"),
             icon: Icons.photo_library_outlined,
             onTap: () async {
               ref.read(changeStyleProvider.state).state = !listStyle;
@@ -40,6 +42,7 @@ class CollapsibleAppbar extends ConsumerWidget {
         background: RotatedBox(
           quarterTurns: -1,
           child: ListWheelScrollView.useDelegate(
+              key: const Key("imageLiked"),
               useMagnifier: true,
               physics: const FixedExtentScrollPhysics(),
               itemExtent: AppConstants.getSize(context).width,

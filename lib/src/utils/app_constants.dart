@@ -4,8 +4,10 @@ class AppConstants {
   static Size getSize(BuildContext context) => MediaQuery.of(context).size;
   static ThemeData getTheme(BuildContext context) => Theme.of(context);
   static const paddingSize = 24.0;
+  static const imageTest =
+      "https://images.pexels.com/photos/2880507/pexels-photo-2880507.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800";
   static const apiKey =
-      "563492ad6f9170000100000178da5f913d7f47aa98df29c7929217df";
+      "563492ad6f917000010000017239aebdd8654de3bb71b203cf1c153c ";
   static const baseUrl = "api.pexels.com";
   static const curatedUrl = "/v1/curated";
 }

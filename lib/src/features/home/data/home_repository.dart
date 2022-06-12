@@ -10,17 +10,21 @@ class CuratedPhotosRepository {
   CuratedPhotos? get currentState => _state.value;
 
   Future<void> getCuratedPhotos() async {
-    if (_state.value == null) {
-      final response = await CuratedPhotoClient.getCuratedPhotos();
-      final parser = CuratedPhotosParser();
-      if (response.statusCode == 200) {
-        final curatedPhotos = await parser.decodeIsolate(response.body);
-        _state.value = curatedPhotos;
-      }
-    }
+    print("malah ini");
+    final response = await CuratedPhotoClient.getCuratedPhotos(80);
+    final parser = CuratedPhotosParser();
+    final curatedPhotos = await parser.decodeIsolate(response.body);
+    _state.value = curatedPhotos;
   }
 
-  void setCuratedPhotos(CuratedPhotos curatedPhotos) {
+  Future<void> loadMoreCuratedPhotos(int pages) async {
+    final response = await CuratedPhotoClient.getCuratedPhotos(pages);
+    final parser = CuratedPhotosParser();
+    final curatedPhotos = await parser.decodeIsolate(response.body);
+    _state.value = curatedPhotos;
+  }
+
+  Future<void> setCuratedPhotos(CuratedPhotos curatedPhotos) async {
     _state.value = curatedPhotos;
   }
 

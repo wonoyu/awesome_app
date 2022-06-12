@@ -1,13 +1,13 @@
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as httpClient;
 import 'package:awesome_app/src/utils/app_constants.dart';
 
 class CuratedPhotosApi {
-  static Uri curatedPhotosUri() => Uri(
+  static Uri curatedPhotosUri(int pages) => Uri(
         scheme: "https",
         host: AppConstants.baseUrl,
         path: AppConstants.curatedUrl,
         queryParameters: {
-          "per_page": '80',
+          "per_page": '$pages',
         },
       );
 
@@ -19,9 +19,9 @@ class CuratedPhotosApi {
 }
 
 class CuratedPhotoClient {
-  static Future<http.Response> getCuratedPhotos() async {
-    return await http.get(
-      CuratedPhotosApi.curatedPhotosUri(),
+  static Future<httpClient.Response> getCuratedPhotos(int pages) async {
+    return await httpClient.get(
+      CuratedPhotosApi.curatedPhotosUri(pages),
       headers: CuratedPhotosApi.headers(),
     );
   }

@@ -1,23 +1,24 @@
 import 'package:awesome_app/src/features/home/data/home_repository.dart';
 import 'package:awesome_app/src/features/home/data/liked_photos_repository.dart';
 import 'package:awesome_app/src/features/home/domain/curated_photos.dart';
-import 'package:awesome_app/src/utils/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeScreenController extends StateNotifier<AsyncValue<void>> {
   HomeScreenController({
     required this.curatedPhotosRepository,
-    required this.sharedPreferencesProvider,
-  }) : super(const AsyncData(null)) {
-    getCuratedPhotos();
-  }
+  }) : super(const AsyncData<void>(null));
   final CuratedPhotosRepository curatedPhotosRepository;
-  final SharedPreferencesProvider sharedPreferencesProvider;
+
+  void init() {
+    if (curatedPhotosRepository.currentState == null) {
+      getCuratedPhotos();
+    }
+  }
 
   Future<void> getCuratedPhotos() async {
+    print(curatedPhotosRepository.currentState);
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-        () => curatedPhotosRepository.getCuratedPhotos());
+    state = await AsyncValue.guard(curatedPhotosRepository.getCuratedPhotos);
   }
 
   Future<void> setCuratedPhotos(CuratedPhotos curatedPhotos) async {
@@ -25,8 +26,22 @@ class HomeScreenController extends StateNotifier<AsyncValue<void>> {
   }
 }
 
+// class LoadMoreController extends StateNotifier<AsyncValue<void>> {
+//   LoadMoreController({
+//     required this.curatedPhotosRepository,
+//   }) : super(const AsyncData<void>(null));
+//   final CuratedPhotosRepository curatedPhotosRepository;
+
+//   Future<void> loadMoreCuratedPhotos(int pages) async {
+//     state = const AsyncLoading();
+//     state = await AsyncValue.guard(
+//       () => curatedPhotosRepository.loadMoreCuratedPhotos(pages),
+//     );
+//   }
+// }
+
 class LikedPhotosController extends StateNotifier<AsyncValue<void>> {
-  LikedPhotosController(this.likedPhotosRepository)
+  LikedPhotosController({required this.likedPhotosRepository})
       : super(const AsyncData(null));
   final LikedPhotosRepository likedPhotosRepository;
 
@@ -43,20 +58,31 @@ final likedPhotosControllerProvider =
     StateNotifierProvider.autoDispose<LikedPhotosController, AsyncValue<void>>(
         (ref) {
   final likedPhotosRepository = ref.watch(likedPhotosRepositoryProvider);
-  return LikedPhotosController(likedPhotosRepository);
+  return LikedPhotosController(likedPhotosRepository: likedPhotosRepository);
 });
 
+// final loadMoreControllerProvider =
+//     StateNotifierProvider.autoDispose<LoadMoreController, AsyncValue<void>>(
+//         (ref) {
+//   final curatedPhotosRepository = ref.watch(curatedPhotosRepositoryProvider);
+//   return LoadMoreController(curatedPhotosRepository: curatedPhotosRepository);
+// });
+
 final homeScreenControllerProvider =
-    StateNotifierProvider<HomeScreenController, AsyncValue<void>>((ref) {
+    StateNotifierProvider.autoDispose<HomeScreenController, AsyncValue<void>>(
+        (ref) {
   final curatedPhotosRepository = ref.watch(curatedPhotosRepositoryProvider);
-  final sharedPreferences = ref.watch(sharedPreferencesProvider);
   return HomeScreenController(
-      curatedPhotosRepository: curatedPhotosRepository,
-      sharedPreferencesProvider: sharedPreferences);
+    curatedPhotosRepository: curatedPhotosRepository,
+  )..init();
 });
 
 final pageRequestProvider = StateProvider<int>((ref) {
   return 10;
+});
+
+final isLoadingProvider = StateProvider<bool>((ref) {
+  return false;
 });
 
 final changeStyleProvider = StateProvider<bool>((ref) {

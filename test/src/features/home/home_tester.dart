@@ -1,38 +1,55 @@
-import 'package:awesome_app/src/app.dart';
 import 'package:awesome_app/src/features/home/data/home_repository.dart';
-import 'package:awesome_app/src/features/home/presentation/collapsible_appbar.dart';
+import 'package:awesome_app/src/features/home/presentation/home_controller.dart';
 import 'package:awesome_app/src/features/home/presentation/home_gridview.dart';
-import 'package:awesome_app/src/features/home/presentation/home_listview.dart';
+import 'package:awesome_app/src/utils/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+import '../../../mocks.dart';
+import 'presentation/home_listview_test.dart';
 
 class HomeTester {
   HomeTester(this.tester);
   final WidgetTester tester;
 
   Future<void> pumpApp(
-      {CuratedPhotosRepository? curatedPhotosRepository,
+      {required HomeScreenController controller,
+      required CuratedPhotosRepository curatedPhotosRepository,
+      required MockNavigatorObserver mockNavigatorObserver,
       bool settle = true}) async {
     await tester.pumpWidget(
-      ProviderScope(overrides: [
-        if (curatedPhotosRepository != null)
+      ProviderScope(
+        overrides: [
           curatedPhotosRepositoryProvider
-              .overrideWithValue(curatedPhotosRepository)
-      ], child: const AwesomeApp()),
+              .overrideWithValue(curatedPhotosRepository),
+          homeScreenControllerProvider
+              .overrideWithProvider(homeScreenControllerProvider),
+          pageRequestProvider.overrideWithValue(StateController(1)),
+        ],
+        child: MaterialApp(
+          onGenerateRoute: (settings) => AppRouter.onGenerateRoute(settings),
+          navigatorObservers: [mockNavigatorObserver],
+          home: const ListViewContentTest(),
+        ),
+      ),
+      // const Duration(seconds: 5),
     );
-    if (settle) await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
+    curatedPhotosRepository.currentState;
+    expect(find.byType(Card), findsOneWidget);
+    await tester.tap(find.byType(Card));
+    when(() => mockNavigatorObserver.didPush(any(), any()))
+        .thenAnswer((invocation) {});
+    // await tester.pump(const Duration(seconds: 5));
+    // expect(find.byType(ListView), findsOneWidget);
   }
 
   Future<void> changeStyle() async {
-    find.widgetWithIcon(ConsumerWidget, Icons.photo_library_outlined);
-    final collapsible =
-        find.byWidget(const CollapsibleAppbar(image: AssetImage("")));
-    final button = find.byWidget(
-        AppbarActions(icon: Icons.photo_library_outlined, onTap: () async {}));
-    expect(collapsible, findsOneWidget);
-    expect(button, findsOneWidget);
-    await tester.tap(button);
+    final finder = find.byType(CircularProgressIndicator);
+    expect(finder, findsOneWidget);
+    // await tester.tap(finder);
     await tester.pumpAndSettle();
   }
 
@@ -44,14 +61,14 @@ class HomeTester {
   }
 
   Future<void> goToDetailPhoto() async {
-    final detector = find.byKey(const Key("photoDetail"));
-    expect(detector, findsWidgets);
+    final detector = find.byType(GestureDetector);
+    expect(detector, findsOneWidget);
     await tester.tap(detector);
     await tester.pumpAndSettle();
   }
 
   void expectChangeStyleListView() {
-    final style = find.byWidget(const ListViewContent());
+    final style = find.byWidget(const ListViewContentTest());
     expect(style, findsOneWidget);
   }
 
@@ -60,9 +77,8 @@ class HomeTester {
     expect(style, findsOneWidget);
   }
 
-  void expectDetailScreen() {
-    final detector = find.byKey(const Key("source"));
-    expect(detector, findsOneWidget);
+  void expectDetailScreen(MockNavigatorObserver observer) {
+    observer.didPush(captureAny(), captureAny());
   }
 
   void expectImage() {
